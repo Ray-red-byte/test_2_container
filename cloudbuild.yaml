@@ -2,21 +2,35 @@ options:
   default_logs_bucket_behavior: 'REGIONAL_USER_OWNED_BUCKET'
 
 steps:
-# Build the frontend Docker image
+# Build the frontend Docker image with both COMMIT_SHA and latest tags
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/terraform-429505/frontend:$COMMIT_SHA', './frontend']
+  args: [
+    'build', 
+    '-t', 'gcr.io/terraform-429505/frontend:$COMMIT_SHA', 
+    '-t', 'gcr.io/terraform-429505/frontend:latest', 
+    './frontend'
+  ]
 
-# Push the frontend image to the Container Registry
+# Push both the COMMIT_SHA and latest tags for the frontend image
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/terraform-429505/frontend:$COMMIT_SHA']
-
-# Build the backend Docker image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/terraform-429505/backend:$COMMIT_SHA', './backend']
+  args: ['push', 'gcr.io/terraform-429505/frontend:latest']
 
-# Push the backend image to the Container Registry
+# Build the backend Docker image with both COMMIT_SHA and latest tags
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build', 
+    '-t', 'gcr.io/terraform-429505/backend:$COMMIT_SHA', 
+    '-t', 'gcr.io/terraform-429505/backend:latest', 
+    './backend'
+  ]
+
+# Push both the COMMIT_SHA and latest tags for the backend image
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/terraform-429505/backend:$COMMIT_SHA']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/terraform-429505/backend:latest']
 
 images:
   - 'gcr.io/terraform-429505/frontend:latest'
